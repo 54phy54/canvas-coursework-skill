@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "name": "canvas-coursework-skill",
+  "version": "1.0.0",
+  "description": "Read-only Canvas course sync helper for the Codex skill",
+  "dependencies": {
+    "playwright": "^1.62.1"
+  }
+}
