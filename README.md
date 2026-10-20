@@ -10,6 +10,8 @@ Humanizer is a separate skill from [blader/humanizer](https://github.com/blader/
 
 ## Use
 
-Ask Codex, for example: “Use Canvas coursework for SSW 555 homework 2.” On first use, provide the school's Canvas URL and sign in in the browser opened for the sync. The helper makes read-only requests and saves accessible course material under `~/Documents/Codex/Canvas Courses` unless you choose another location. It does not store passwords or API tokens. Check each course's `manifest.json` for unavailable resources and sync errors.
+Ask Codex, for example: “Use Canvas coursework for SSW 555 homework 2.” If an assignment page is already open, Codex starts there. Otherwise it locates that exact assignment, asks for the Canvas URL or sign-in only when needed, and gathers the assignment's relevant materials before drafting. A full course sync is available when requested or useful for the work; it is not required before opening the assignment.
+
+The read-only sync helper saves accessible course material under `~/Documents/Codex/Canvas Courses` unless you choose another location. It does not store passwords or API tokens. Check each course's `manifest.json` for unavailable resources and sync errors.
 
 Course content, submissions, and downloaded files may be private. Keep them out of this source repository. The sync helper has not been verified against every institution's Canvas configuration; locked content and external tools may require browser access.
