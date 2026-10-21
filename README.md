@@ -4,13 +4,15 @@ This Codex skill helps a student organize their Canvas course materials by cours
 
 ## Install
 
-Copy this repository to `~/.codex/skills/canvas-coursework`, then start a new Codex chat. Codex desktop provides Node.js and Playwright through its workspace dependencies. In another environment, run `npm install` and `npx playwright install chromium` in the skill directory.
+On a new Windows laptop, clone this repository and run `powershell -ExecutionPolicy Bypass -File .\install.ps1` from its root. This installs Canvas coursework plus pinned upstream Humanizer and BrowserSkill skill instructions from GitHub. Add `-InstallBrowserSkillCli` to install BrowserSkill's CLI using its official installer. Connect the BrowserSkill Chrome or Edge extension and run `bsk doctor` before using that route. Restart Codex to discover the skills. The separate Canvas Focus Browser can use its own browser bridge without BrowserSkill.
+
+Codex desktop provides Node.js and Playwright through its workspace dependencies. In another environment, run `npm install` and `npx playwright install chromium` in the installed Canvas skill directory. Computer Use comes from the Codex app where available; this repository does not redistribute its plugin.
 
 Humanizer is a separate skill from [blader/humanizer](https://github.com/blader/humanizer). BrowserSkill is optional and comes from [Tencent/BrowserSkill](https://github.com/Tencent/BrowserSkill); it requires its own CLI and Chrome or Edge extension. The Canvas skill can use Codex browser controls when BrowserSkill is unavailable.
 
 ## Use
 
-Ask Codex, for example: “Use Canvas coursework for SSW 555 homework 2.” If an assignment page is already open, Codex starts there. Otherwise it locates that exact assignment, asks for the Canvas URL or sign-in only when needed, and gathers the assignment's relevant materials before drafting. A full course sync is available when requested or useful for the work; it is not required before opening the assignment.
+Ask Codex, for example: “Use Canvas coursework for NSW 555 quiz 2” or “Finish NSW 555 classwork 3 and leave it ready for me to submit.” If the page is already open, Codex starts there. Otherwise it locates that exact work, asks for sign-in only when needed, and gathers documents from the matching course/classwork. Quiz questions and Word documents are read from rendered screenshots, including scrolled sections; source text is paraphrased. Answers may be typed or selected in Canvas, but final submission stays with the student. Finished files appear in Canvas Focus Browser's Downloads list.
 
 The read-only sync helper saves accessible course material under `~/Documents/Codex/Canvas Courses` unless you choose another location. It does not store passwords or API tokens. Check each course's `manifest.json` for unavailable resources and sync errors.
 
