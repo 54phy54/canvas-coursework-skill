@@ -1,21 +1,23 @@
-# Canvas coursework skill for Codex
+# Canvas coursework for Codex
 
-This Codex skill helps a student organize their Canvas course materials by course, review an assignment against those materials, and prepare work in the requested format. It creates a local course hub, an assignment status summary, and separate folders for each Canvas course.
+This skill starts with the Canvas assignment, quiz, or classwork you name. It keeps materials from each course in a separate folder, uses the matching course's sources, and prepares answers or a finished file for you to review. It can enter answers in Canvas, but leaves the final submission to you.
 
-## Install
+## Download and install on Windows
 
-On a new Windows laptop, clone this repository and run `powershell -ExecutionPolicy Bypass -File .\install.ps1` from its root. This installs Canvas coursework plus the bundled Humanizer and BrowserSkill instructions, without using anything from the first laptop. Their source commits and licenses are listed in [THIRD_PARTY.md](THIRD_PARTY.md). Add `-InstallBrowserSkillCli` to install BrowserSkill's CLI using its official installer. Connect the BrowserSkill Chrome or Edge extension and run `bsk doctor` before using that route. Restart Codex to discover the skills. The separate Canvas Focus Browser can use its own browser bridge without BrowserSkill.
+1. Download this repository with GitHub's **Code → Download ZIP**, then extract it. In PowerShell, run `powershell -ExecutionPolicy Bypass -File .\install.ps1` from the extracted folder. This installs the Canvas skill plus the bundled [Humanizer and BrowserSkill instructions](THIRD_PARTY.md) into `~/.codex/skills`. It uses the files in this repository, not a backup from another computer. Restart Codex afterward.
+2. For the separate browser, download [CanvasFocusBrowser-windows-x64.zip](https://github.com/Yeming4/canvas-coursework-skill/releases/latest/download/CanvasFocusBrowser-windows-x64.zip) from [Releases](https://github.com/Yeming4/canvas-coursework-skill/releases). Extract the whole ZIP and run `CanvasFocusBrowser.exe` inside its folder. Keep the files together. Install Node.js and the Codex CLI, and sign in with `codex login` before using the browser's chat bar.
+3. If you want BrowserSkill to control your existing Chrome or Edge browser, run the installer with `-InstallBrowserSkillCli`, install its upstream browser extension, and check the connection with `bsk doctor`. The separate Canvas Focus Browser uses its own browser bridge and does not require that extension. Computer Use is provided by Codex where available; it is not redistributed here.
 
-Codex desktop provides Node.js and Playwright through its workspace dependencies. In another environment, run `npm install` and `npx playwright install chromium` in the installed Canvas skill directory. Computer Use comes from the Codex app where available; this repository does not redistribute its plugin.
+The browser source is also available as [CanvasFocusBrowser-source.zip](CanvasFocusBrowser-source.zip). To build it yourself, extract it, run `npm ci` and `npm start`. The Windows ZIP above is the ready-to-run package; Node.js is still needed for its local browser bridge.
 
-Humanizer is a separate skill from [blader/humanizer](https://github.com/blader/humanizer). BrowserSkill is optional and comes from [Tencent/BrowserSkill](https://github.com/Tencent/BrowserSkill); it requires its own CLI and Chrome or Edge extension. The Canvas skill can use Codex browser controls when BrowserSkill is unavailable.
+SHA-256 hashes for the browser and bundled skill archives are in [SHA256SUMS.txt](SHA256SUMS.txt). The Windows browser is currently unsigned.
 
-## Use
+## What it does
 
-Ask Codex, for example: “Use Canvas coursework for NSW 555 quiz 2” or “Finish NSW 555 classwork 3 and leave it ready for me to submit.” If the page is already open, Codex starts there. Otherwise it locates that exact work, asks for sign-in only when needed, and gathers documents from the matching course/classwork. Quiz questions and Word documents are read from rendered screenshots, including scrolled sections; source text is paraphrased. Answers may be typed or selected in Canvas, but final submission stays with the student. Finished files appear in Canvas Focus Browser's Downloads list.
+- Opens the specific work you name, such as “Use Canvas coursework for NSW 555 quiz 2,” then gathers the relevant documents from that course or classwork module. A full course sync is available when requested. The default course hub is `~/Documents/Codex/Canvas Courses`.
+- Reads quiz questions and Word assignments from rendered screenshots, scrolling through all relevant pages. If a Word file downloads, it must be rendered before reading. Quiz page text is excluded from the browser's text snapshot; Word viewers can use visual-only mode.
+- Uses course sources to prepare answers in original wording, with citations where needed. For prose, it applies the bundled Humanizer skill as a final writing edit without inventing the student's experiences.
+- Selects or types requested answers but stops before **Submit**, **Turn In**, or **Finish**. For file work, it creates a finished file and lists it in the browser's **Downloads** menu so you can open or locate it.
+- Shows a compact bottom chat bar. Drag the conversation panel's top or left edge to resize it; use the top button or F11 to switch between window and full screen.
 
-The read-only sync helper saves accessible course material under `~/Documents/Codex/Canvas Courses` unless you choose another location. It does not store passwords or API tokens. Check each course's `manifest.json` for unavailable resources and sync errors.
-
-Course content, submissions, and downloaded files may be private. Keep them out of this source repository. The sync helper has not been verified against every institution's Canvas configuration; locked content and external tools may require browser access.
-
-The separate browser's source is in [CanvasFocusBrowser-source.zip](CanvasFocusBrowser-source.zip). On Windows with Node.js, extract it, run `npm install`, then `npm start`; use `npx @electron/packager . CanvasFocusBrowser --platform=win32 --arch=x64 --out dist --no-asar` to make a portable build. The browser keeps your local Canvas session in your own `Documents/Codex/Canvas Focus Browser Profile` folder, which is not included in this repository.
+The browser keeps its sign-in profile in your own `Documents/Codex/Canvas Focus Browser Profile` folder. Neither that profile nor course files, submissions, credentials, or student work are included in this repository. Check each course's `manifest.json` for unavailable or locked resources. Institutional SSO, embedded tools, and document rendering may vary by course and computer.
