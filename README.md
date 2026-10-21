@@ -4,7 +4,7 @@ This Codex skill helps a student organize their Canvas course materials by cours
 
 ## Install
 
-On a new Windows laptop, clone this repository and run `powershell -ExecutionPolicy Bypass -File .\install.ps1` from its root. This installs Canvas coursework plus pinned upstream Humanizer and BrowserSkill skill instructions from GitHub. Add `-InstallBrowserSkillCli` to install BrowserSkill's CLI using its official installer. Connect the BrowserSkill Chrome or Edge extension and run `bsk doctor` before using that route. Restart Codex to discover the skills. The separate Canvas Focus Browser can use its own browser bridge without BrowserSkill.
+On a new Windows laptop, clone this repository and run `powershell -ExecutionPolicy Bypass -File .\install.ps1` from its root. This installs Canvas coursework plus the bundled Humanizer and BrowserSkill instructions, without using anything from the first laptop. Their source commits and licenses are listed in [THIRD_PARTY.md](THIRD_PARTY.md). Add `-InstallBrowserSkillCli` to install BrowserSkill's CLI using its official installer. Connect the BrowserSkill Chrome or Edge extension and run `bsk doctor` before using that route. Restart Codex to discover the skills. The separate Canvas Focus Browser can use its own browser bridge without BrowserSkill.
 
 Codex desktop provides Node.js and Playwright through its workspace dependencies. In another environment, run `npm install` and `npx playwright install chromium` in the installed Canvas skill directory. Computer Use comes from the Codex app where available; this repository does not redistribute its plugin.
 
@@ -17,3 +17,5 @@ Ask Codex, for example: “Use Canvas coursework for NSW 555 quiz 2” or “Fin
 The read-only sync helper saves accessible course material under `~/Documents/Codex/Canvas Courses` unless you choose another location. It does not store passwords or API tokens. Check each course's `manifest.json` for unavailable resources and sync errors.
 
 Course content, submissions, and downloaded files may be private. Keep them out of this source repository. The sync helper has not been verified against every institution's Canvas configuration; locked content and external tools may require browser access.
+
+The separate browser's source is in [CanvasFocusBrowser-source.zip](CanvasFocusBrowser-source.zip). On Windows with Node.js, extract it, run `npm install`, then `npm start`; use `npx @electron/packager . CanvasFocusBrowser --platform=win32 --arch=x64 --out dist --no-asar` to make a portable build. The browser keeps your local Canvas session in your own `Documents/Codex/Canvas Focus Browser Profile` folder, which is not included in this repository.

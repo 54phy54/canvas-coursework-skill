@@ -1,10 +1,9 @@
-param([switch]$InstallBrowserSkillCli)
+param([switch]$InstallBrowserSkillCli, [string]$SkillRoot)
 $ErrorActionPreference = 'Stop'
 
-$skillRoot = Join-Path $HOME '.codex\skills'
+$skillRoot = if ($SkillRoot) { [IO.Path]::GetFullPath($SkillRoot) } else { Join-Path $HOME '.codex\skills' }
 $sourceRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $tempRoot = Join-Path ([IO.Path]::GetTempPath()) ('canvas-skill-install-' + [guid]::NewGuid().ToString('N'))
-$humanizerCommit = '225a6f39ac85f76ee48dbad772ea4abe4ed6c9d8'
 $browserSkillCommit = '3f10983c09fcd443c7420830ab984c9d409954bf'
 
 function Copy-Contents([string]$from, [string]$to) {
@@ -12,16 +11,6 @@ function Copy-Contents([string]$from, [string]$to) {
   Get-ChildItem -LiteralPath $from -Force | ForEach-Object {
     Copy-Item -LiteralPath $_.FullName -Destination $to -Recurse -Force
   }
-}
-
-function Get-GitHubArchive([string]$repo, [string]$commit, [string]$name) {
-  $archive = Join-Path $tempRoot ($name + '.zip')
-  $unpacked = Join-Path $tempRoot $name
-  Invoke-WebRequest -Uri "https://github.com/$repo/archive/$commit.zip" -OutFile $archive
-  Expand-Archive -LiteralPath $archive -DestinationPath $unpacked
-  $folder = Get-ChildItem -LiteralPath $unpacked -Directory | Select-Object -First 1
-  if (-not $folder) { throw "Archive for $repo did not contain a folder." }
-  return $folder.FullName
 }
 
 try {
@@ -33,13 +22,16 @@ try {
   Copy-Contents (Join-Path $sourceRoot 'scripts') (Join-Path $canvasTarget 'scripts')
   Copy-Item -LiteralPath (Join-Path $sourceRoot 'package.json') -Destination $canvasTarget -Force
 
-  $humanizer = Get-GitHubArchive 'blader/humanizer' $humanizerCommit 'humanizer'
+  $humanizer = Join-Path $tempRoot 'humanizer'
+  $browserSkill = Join-Path $tempRoot 'browser-skill'
+  Expand-Archive -LiteralPath (Join-Path $sourceRoot 'humanizer-skill.zip') -DestinationPath $humanizer
+  Expand-Archive -LiteralPath (Join-Path $sourceRoot 'browser-skill.zip') -DestinationPath $browserSkill
   Copy-Contents $humanizer (Join-Path $skillRoot 'humanizer')
-
-  $browserSkill = Get-GitHubArchive 'Tencent/BrowserSkill' $browserSkillCommit 'browser-skill'
-  Copy-Contents (Join-Path $browserSkill 'crates\bsk-cli\skill') (Join-Path $skillRoot 'browser-skill')
+  Copy-Contents $browserSkill (Join-Path $skillRoot 'browser-skill')
   if ($InstallBrowserSkillCli) {
-    & (Join-Path $browserSkill 'install.ps1')
+    $cliInstaller = Join-Path $tempRoot 'bsk-install.ps1'
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Tencent/BrowserSkill/$browserSkillCommit/install.ps1" -OutFile $cliInstaller
+    & $cliInstaller
   }
   Write-Host 'Installed Canvas coursework, Humanizer, and BrowserSkill instructions.'
   Write-Host 'Restart Codex. For BrowserSkill browser control, install its browser extension and run bsk doctor.'
