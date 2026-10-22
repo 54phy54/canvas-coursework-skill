@@ -12,6 +12,8 @@ A separate browser window with a compact chat bar at the bottom. The bar can pas
 
 The repository installers place the Windows app behind a desktop and Start menu shortcut or the macOS app in `~/Applications`. For a source checkout, run `npm ci` then `npm start`. Node.js and the Codex CLI must be installed and available in PATH. Codex must already be logged in (`codex login status`). Install the `canvas-coursework` skill first.
 
+If the app reports a JavaScript error, its details are saved locally in `~/Documents/Codex/Canvas Focus Browser Profile/errors.log`. The app shows the error in its status bar instead of repeatedly opening a native error window.
+
 Enter your school's Canvas URL through the address button in the bottom bar and sign in on the website. Ask, for example, `Use $canvas-coursework to complete SSW 555 Homework 2 from this page.` The assistant receives the current page URL and can read and interact with the page through this app's local browser tools. Saved Canvas course files remain under `~/Documents/Codex/Canvas Courses` when the skill uses its sync helper.
 
 Use Ctrl+L for the address field, Ctrl+R to refresh, and F11 to toggle full screen. The microphone button tries Chromium speech recognition. If it is unavailable, focus the text box and use Windows voice typing (Win+H).

@@ -17,6 +17,7 @@ const DOWNLOAD_DIR = path.join(os.homedir(), "Documents", "Codex", "Browser Down
 const WORK_DIR = path.join(os.homedir(), "Documents", "Codex");
 const PROFILE_DIR = path.join(WORK_DIR, "Canvas Focus Browser Profile");
 const DOWNLOAD_INDEX = path.join(PROFILE_DIR, "downloads.json");
+const ERROR_LOG = path.join(PROFILE_DIR, "errors.log");
 fs.mkdirSync(PROFILE_DIR, { recursive: true });
 app.setPath("userData", PROFILE_DIR);
 const token = crypto.randomBytes(32).toString("hex");
@@ -38,6 +39,17 @@ let downloadsOpen = false;
 let downloads = [];
 try { downloads = JSON.parse(fs.readFileSync(DOWNLOAD_INDEX, "utf8")).filter(x => x && typeof x.path === "string").slice(0, 100); } catch { /* First launch. */ }
 
+function reportMainError(source, error) {
+  const detail = error?.stack || String(error);
+  const entry = `[${new Date().toISOString()}] ${source}\n${detail}\n`;
+  try { fs.appendFileSync(ERROR_LOG, entry); } catch { /* Keep reporting if the profile is read-only. */ }
+  try { process.stderr.write(entry); } catch { /* No terminal is attached to desktop launches. */ }
+  try { send("app:error", { message: error?.message || String(error) }); } catch { /* The window may be closing. */ }
+}
+
+process.on("uncaughtException", error => reportMainError("Uncaught main-process error", error));
+process.on("unhandledRejection", error => reportMainError("Unhandled main-process rejection", error));
+
 function recordDownload(filePath, source) {
   const resolved = path.resolve(String(filePath || ""));
   const allowed = path.relative(WORK_DIR, resolved);
@@ -51,7 +63,9 @@ function recordDownload(filePath, source) {
 }
 
 function send(event, value) {
-  if (window && !window.isDestroyed()) window.webContents.send(event, value);
+  if (window && !window.isDestroyed() && !window.webContents.isDestroyed()) {
+    window.webContents.send(event, value);
+  }
 }
 
 function safeUrl(input) {
@@ -65,11 +79,17 @@ function safeUrl(input) {
 }
 
 function pageInfo() {
-  return { url: pageView?.webContents.getURL() || "", title: pageView?.webContents.getTitle() || "", busy, fullscreen: window?.isFullScreen() || false };
+  const contents = pageView?.webContents;
+  return {
+    url: contents && !contents.isDestroyed() ? contents.getURL() : "",
+    title: contents && !contents.isDestroyed() ? contents.getTitle() : "",
+    busy,
+    fullscreen: window && !window.isDestroyed() ? window.isFullScreen() : false
+  };
 }
 
 function layout() {
-  if (!window || !pageView) return;
+  if (!window || window.isDestroyed() || !pageView || pageView.webContents.isDestroyed()) return;
   const [width, height] = window.getContentSize();
   const top = TOP_HEIGHT + (downloadsOpen ? 260 : 0);
   pageView.setBounds({ x: 0, y: top, width, height: Math.max(100, height - top - BAR_HEIGHT - (panelOpen ? panelHeight + 14 : 0)) });
@@ -291,6 +311,8 @@ function createWindow() {
     webPreferences: { preload: path.join(APP_DIR, "preload.js"), nodeIntegration: false, contextIsolation: true, sandbox: true }
   });
   window.loadFile(path.join(APP_DIR, "index.html"));
+  window.webContents.on("preload-error", (_event, preloadPath, error) => reportMainError(`Loading ${path.basename(preloadPath)}`, error));
+  window.webContents.on("render-process-gone", (_event, details) => reportMainError("Conversation renderer stopped", new Error(details.reason)));
   const webSession = session.fromPartition("persist:canvas-focus-browser");
   webSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   webSession.on("will-download", (_event, item) => {
@@ -300,14 +322,19 @@ function createWindow() {
     for (let i = 1; fs.existsSync(target); i++) target = path.join(DOWNLOAD_DIR, `${i}-${filename}`);
     item.setSavePath(target);
     item.once("done", (_event, state) => {
-      if (state === "completed") recordDownload(target, "Downloaded from browser");
+      if (state === "completed") {
+        try { recordDownload(target, "Downloaded from browser"); }
+        catch (error) { reportMainError("Recording a download", error); }
+      }
       send("download:done", { state, path: target });
     });
   });
   pageView = new WebContentsView({ webPreferences: {
     session: webSession, nodeIntegration: false, contextIsolation: true, sandbox: true,
+    safeDialogs: true,
     webSecurity: true, allowRunningInsecureContent: false
   } });
+  pageView.webContents.on("render-process-gone", (_event, details) => reportMainError("Browser renderer stopped", new Error(details.reason)));
   window.contentView.addChildView(pageView);
   layout();
   window.on("resize", layout);
@@ -317,6 +344,8 @@ function createWindow() {
     if (activeChild) activeChild.kill();
     server?.close();
     if (pageView && !pageView.webContents.isDestroyed()) pageView.webContents.close();
+    pageView = null;
+    window = null;
   });
   pageView.webContents.on("did-navigate", () => send("page:state", pageInfo()));
   pageView.webContents.on("did-navigate-in-page", () => send("page:state", pageInfo()));
@@ -374,7 +403,12 @@ function createWindow() {
   }
 }
 
-app.on("second-instance", () => { if (window) { if (window.isMinimized()) window.restore(); window.focus(); } });
+app.on("second-instance", () => {
+  if (window && !window.isDestroyed()) {
+    if (window.isMinimized()) window.restore();
+    window.focus();
+  }
+});
 
 if (gotSingleInstanceLock) app.whenReady().then(() => {
   app.setName("Canvas Focus Browser");
@@ -424,6 +458,6 @@ if (gotSingleInstanceLock) app.whenReady().then(() => {
     return runCodex(clean);
   });
   createWindow();
-});
+}).catch(error => reportMainError("Starting Canvas Focus Browser", error));
 
 app.on("window-all-closed", () => app.quit());

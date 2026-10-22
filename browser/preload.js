@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld("focusBrowser", {
   openDownload: (filePath, reveal = false) => ipcRenderer.invoke("downloads:open", filePath, reveal),
   send: message => ipcRenderer.invoke("chat:send", message),
   on: (channel, callback) => {
-    if (!["page:state", "chat:progress", "download:done", "downloads:changed", "ui:focus-address"].includes(channel)) return;
+    if (!["page:state", "chat:progress", "download:done", "downloads:changed", "ui:focus-address", "app:error"].includes(channel)) return;
     ipcRenderer.on(channel, (_event, value) => callback(value));
   }
 });

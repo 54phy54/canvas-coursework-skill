@@ -140,6 +140,7 @@ api.on("ui:focus-address", () => addressVisible(true));
 api.on("download:done", item => status(item.state === "completed" ? `Saved download: ${item.path}` : `Download ${item.state}`));
 api.on("downloads:changed", renderDownloads);
 api.on("chat:progress", item => { if (item.kind === "status") status(item.text); });
+api.on("app:error", item => status(`Browser error: ${item.message}. Details: Documents/Codex/Canvas Focus Browser Profile/errors.log`));
 
 $("mic").addEventListener("click", () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
