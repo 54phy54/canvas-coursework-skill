@@ -1,0 +1,80 @@
+name: Release Canvas Focus Browser
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win32
+            arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm ci
+        working-directory: browser
+      - name: Check browser source
+        run: npm run check
+        working-directory: browser
+      - name: Package Windows app
+        if: matrix.platform == 'win32'
+        shell: pwsh
+        working-directory: browser
+        run: |
+          npx --no-install @electron/packager . CanvasFocusBrowser --platform=win32 --arch=x64 --out=dist --overwrite --icon=assets/app-icon.ico
+          Compress-Archive -LiteralPath dist/CanvasFocusBrowser-win32-x64 -DestinationPath "$env:GITHUB_WORKSPACE/CanvasFocusBrowser-windows-x64.zip"
+      - name: Package macOS app
+        if: matrix.platform == 'darwin'
+        shell: bash
+        working-directory: browser
+        run: |
+          npx --no-install @electron/packager . CanvasFocusBrowser --platform=darwin --arch=${{ matrix.arch }} --out=dist --overwrite --icon=assets/app-icon.icns --app-bundle-id=com.canvasfocus.browser
+          ditto -c -k --sequesterRsrc --keepParent "dist/CanvasFocusBrowser-darwin-${{ matrix.arch }}/CanvasFocusBrowser.app" "$GITHUB_WORKSPACE/CanvasFocusBrowser-macos-${{ matrix.arch }}.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle-${{ matrix.platform }}-${{ matrix.arch }}
+          path: CanvasFocusBrowser-*.zip
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: bundle-*
+          path: assets
+          merge-multiple: true
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" assets/*.zip --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" assets/*.zip \
+              --title "Canvas Focus Browser $GITHUB_REF_NAME" \
+              --notes "Windows desktop launcher and macOS app builds. Download this repository and run the matching installer to install the Canvas coursework skill, its companion skills, and the app. The app uses your local Codex CLI login. These builds are unsigned."
+          fi

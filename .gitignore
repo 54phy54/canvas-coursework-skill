@@ -6,3 +6,4 @@ data/
 downloads/
 browser-profile/
 *.log
+browser/dist/

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:">
+  <title>Canvas Focus Browser</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="topbar">
+    <span class="app-name">Canvas Focus Browser</span>
+    <div class="top-actions">
+      <button id="downloads-toggle" class="top-button" aria-label="Downloads" title="Downloads">↓ <span id="download-count">0</span></button>
+      <button id="window-toggle" class="top-button" aria-label="Toggle full screen" title="Toggle full screen · F11">▣ Window</button>
+    </div>
+  </div>
+  <div id="downloads-panel" hidden>
+    <div class="downloads-head"><strong>Downloads and finished files</strong><button id="close-downloads" class="small-button" aria-label="Close downloads">×</button></div>
+    <div id="downloads-list"></div>
+  </div>
+  <main id="panel" aria-live="polite" hidden>
+    <div id="panel-resize" role="separator" aria-label="Resize conversation height" title="Drag to resize conversation"></div>
+    <div id="panel-resize-width" role="separator" aria-label="Resize conversation width" title="Drag to resize conversation"></div>
+    <div class="panel-head"><strong>Conversation</strong><button id="close-panel" class="icon" aria-label="Close conversation">×</button></div>
+    <div id="messages"></div>
+  </main>
+  <div class="dock">
+    <div id="address-row" hidden>
+      <span class="address-label">GO TO</span>
+      <input id="address" type="url" spellcheck="false" placeholder="https://school.instructure.com">
+      <button id="navigate">Open</button>
+    </div>
+    <div class="command-row">
+      <button id="back" class="icon" aria-label="Back" title="Back">←</button>
+      <button id="forward" class="icon" aria-label="Forward" title="Forward">→</button>
+      <button id="address-toggle" class="site-chip" title="Address · Ctrl+L">New tab</button>
+      <input id="prompt" type="text" autocomplete="off" placeholder="Ask Codex to work on this page, a file, or an assignment…">
+      <button id="mic" class="icon" aria-label="Voice input" title="Voice input">🎙</button>
+      <button id="send" class="send" aria-label="Send request">↗</button>
+      <button id="show-panel" class="icon" aria-label="Show conversation" title="Conversation">☰</button>
+    </div>
+    <div id="status" role="status">Ready · Ctrl+L to open an address</div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
