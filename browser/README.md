@@ -10,7 +10,9 @@ A separate browser window with a compact chat bar at the bottom. The bar can pas
 
 ## Start
 
-The repository installers place the Windows app behind a desktop and Start menu shortcut or the macOS app in `~/Applications`. For a source checkout, run `npm ci` then `npm start`. Node.js and the Codex CLI must be installed and available in PATH. Codex must already be logged in (`codex login status`). Install the `canvas-coursework` skill first.
+The repository installers place the Windows app behind a desktop and Start menu shortcut or the macOS app in `~/Applications`. For a source checkout, install Node.js and run `npm ci` then `npm start`. The Codex CLI must be installed, available in PATH, and logged in (`codex login status`). Install the `canvas-coursework` skill first.
+
+The bottom chat bar starts its bundled `focus_browser` MCP server automatically. It does not need a separate MCP registration or a system Node.js path. Node.js is still used by the optional Canvas course sync helper.
 
 If the app reports a JavaScript error, its details are saved locally in `~/Documents/Codex/Canvas Focus Browser Profile/errors.log`. The app shows the error in its status bar instead of repeatedly opening a native error window.
 

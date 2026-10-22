@@ -4,11 +4,13 @@ Canvas Focus Browser is a desktop app with an embedded browser and a compact Cod
 
 ## Install on Windows
 
-1. Install Node.js and the Codex CLI, then run `codex login` once.
+1. Install the Codex CLI and run `codex login` once. Install Node.js if you want the optional full Canvas course sync.
 2. Download this repository with **Code → Download ZIP** and extract it.
 3. In the extracted folder, double-click `Install.cmd`. You can also run `powershell -ExecutionPolicy Bypass -File .\install.ps1` in PowerShell.
 
 The installer adds the Canvas skill, the bundled [Humanizer and BrowserSkill instructions](THIRD_PARTY.md), and the latest Windows app. It checks the app download's SHA-256 digest, installs the app under your user profile, and creates **Canvas Focus Browser** shortcuts on the desktop and Start menu. Open that icon to use the browser and its agent. The app is unsigned.
+
+The browser's bottom chat bar starts its bundled `focus_browser` MCP connection automatically. You do not need to add this MCP server in Codex settings. To update an older installation, download a fresh repository ZIP and run `Install.cmd` again.
 
 To install BrowserSkill's optional Chrome or Edge bridge too, add `-InstallBrowserSkillCli` and then install its upstream extension. The Canvas Focus Browser app uses its own bridge and does not require that extension. Computer Use is supplied by Codex where available and is not copied by this repository.
 

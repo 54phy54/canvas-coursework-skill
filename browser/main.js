@@ -260,8 +260,9 @@ async function runCodex(message) {
 
 Recent conversation:\n${recent}\n\nStudent request: ${message}`;
   const args = ["exec", "--json", "--skip-git-repo-check", "--approve-for-me", "-C", WORK_DIR,
-    "-c", `mcp_servers.focus_browser.command=${tomlString("node")}`,
+    "-c", `mcp_servers.focus_browser.command=${tomlString(process.execPath)}`,
     "-c", `mcp_servers.focus_browser.args=[${tomlString(path.join(APP_DIR, "mcp-server.js"))}]`,
+    "-c", `mcp_servers.focus_browser.env.ELECTRON_RUN_AS_NODE=${tomlString("1")}`,
     "-c", `mcp_servers.focus_browser.env.FOCUS_PORT=${tomlString(serverPort)}`,
     "-c", `mcp_servers.focus_browser.env.FOCUS_TOKEN=${tomlString(token)}`,
     "-"];

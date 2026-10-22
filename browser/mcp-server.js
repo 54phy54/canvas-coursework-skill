@@ -94,7 +94,7 @@ async function handle(message) {
       case "initialize":
         reply(message.id, {
           protocolVersion: "2025-06-18", capabilities: { tools: {} },
-          serverInfo: { name: "canvas-focus-browser", version: "0.2.0" }
+          serverInfo: { name: "canvas-focus-browser", version: require("./package.json").version }
         });
         break;
       case "ping": reply(message.id, {}); break;

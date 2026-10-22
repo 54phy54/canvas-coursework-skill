@@ -107,7 +107,7 @@ try {
     Write-Host "Canvas Focus Browser is installed at $executable"
   }
 
-  if (-not (Get-Command node -ErrorAction SilentlyContinue)) { Write-Warning 'Install Node.js before using the app chat bar.' }
+  if (-not (Get-Command node -ErrorAction SilentlyContinue)) { Write-Warning 'Install Node.js to use the optional Canvas course sync helper.' }
   if (-not (Get-Command codex -ErrorAction SilentlyContinue)) { Write-Warning 'Install the Codex CLI and run codex login before using the app chat bar.' }
   Write-Host 'Restart Codex to discover the skill, then launch Canvas Focus Browser from the desktop or Start menu.'
   Write-Host 'The app uses your installed Codex agent and keeps Canvas sign-in data on this computer.'

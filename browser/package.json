@@ -1,6 +1,6 @@
 {
   "name": "canvas-focus-browser",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "description": "Canvas study app with an embedded browser and Codex agent",
   "main": "main.js",
