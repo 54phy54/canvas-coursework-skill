@@ -153,8 +153,20 @@ async function browserCommand(command, args = {}) {
     case "screenshot": return screenshot();
     case "scroll": {
       const pixels = Math.max(-2000, Math.min(2000, Number(args.pixels) || 0));
-      await pageView.webContents.executeJavaScript(`window.scrollBy(0, ${pixels})`);
-      return { scrolled: pixels };
+      const viewport = await pageView.webContents.executeJavaScript('({ width: innerWidth, height: innerHeight })');
+      const x = args.x === undefined ? viewport.width / 2 : Number(args.x);
+      const y = args.y === undefined ? viewport.height / 2 : Number(args.y);
+      if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || y < 0 || x >= viewport.width || y >= viewport.height) {
+        throw new Error(`Scroll point must be inside the visible page (${viewport.width}×${viewport.height}).`);
+      }
+      const debuggerApi = pageView.webContents.debugger;
+      const attached = debuggerApi.isAttached();
+      if (!attached) debuggerApi.attach("1.3");
+      try {
+        // A wheel event reaches the scrollable area under the point, including cross-origin Word viewers.
+        await debuggerApi.sendCommand("Input.dispatchMouseEvent", { type: "mouseWheel", x, y, deltaX: 0, deltaY: pixels });
+      } finally { if (!attached && debuggerApi.isAttached()) debuggerApi.detach(); }
+      return { scrolled: pixels, x, y, note: "Capture another screenshot to verify the document moved." };
     }
     case "register-output": return recordDownload(args.path, "Created by Codex");
     case "navigate": {
@@ -373,6 +385,11 @@ function createWindow() {
     window.webContents.once("did-finish-load", () => {
       setTimeout(async () => {
         try {
+          if (process.env.FOCUS_SMOKE_URL) await browserCommand("navigate", { url: process.env.FOCUS_SMOKE_URL });
+          if (process.env.FOCUS_SMOKE_SCROLL) {
+            const result = await browserCommand("scroll", JSON.parse(process.env.FOCUS_SMOKE_SCROLL));
+            process.stdout.write(`Smoke scroll: ${JSON.stringify(result)}\n`);
+          }
           const state = await browserCommand("state");
           process.stdout.write(`Smoke page: ${state.title} (${state.url})\n`);
           try {

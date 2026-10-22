@@ -4,7 +4,7 @@ This is the desktop app launched by the Windows desktop shortcut or the macOS Ap
 
 The top bar has Downloads for browser downloads and finished files, plus a Window/Full screen toggle (also F11). The bottom conversation opens at 250 pixels high; drag its top edge to change height or its left edge to change width. The size is remembered. Codex can register a created file so it appears in Downloads with Open and Show in folder buttons.
 
-For Canvas quiz questions and Word assignments, Codex uses screenshots of the visible rendered page. It can scroll for additional questions and enter answers, but final submission is left to the student. If a DOCX downloads rather than opening, the Canvas skill calls for rendering its pages before reading them.
+For Canvas quiz questions and Word assignments, Codex uses screenshots of the visible rendered page. Its scroll tool sends a mouse-wheel event inside the page and accepts screenshot coordinates to scroll embedded Word or PDF viewers. Codex captures another screenshot to check that the document moved. It can enter answers, but final submission is left to the student. If a DOCX downloads rather than opening, the Canvas skill calls for rendering its pages before reading them.
 
 A separate browser window with a compact chat bar at the bottom. The bar can pass the current page to your existing Codex CLI login, including the installed `canvas-coursework` skill. The app keeps its Chromium sign-in profile in `~/Documents/Codex/Canvas Focus Browser Profile`; it does not share cookies with Codex's in-app browser or Chrome.
 

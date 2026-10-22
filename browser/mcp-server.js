@@ -22,8 +22,8 @@ const tools = [
   },
   {
     name: "browser_scroll",
-    description: "Scroll the visible page vertically by pixels, then capture another screenshot. Positive values scroll down.",
-    inputSchema: { type: "object", properties: { pixels: { type: "number" } }, required: ["pixels"], additionalProperties: false }
+    description: "Send a mouse-wheel scroll at a point in the visible page. This reaches embedded Word/PDF viewers and cross-origin frames. Positive pixels scroll down. Defaults to page center; pass x/y from the screenshot to aim inside the document, then capture another screenshot to verify movement.",
+    inputSchema: { type: "object", properties: { pixels: { type: "number" }, x: { type: "number" }, y: { type: "number" } }, required: ["pixels"], additionalProperties: false }
   },
   {
     name: "browser_register_output",

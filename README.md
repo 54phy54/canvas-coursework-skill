@@ -26,7 +26,7 @@ The [latest release](https://github.com/54phy54/canvas-coursework-skill/releases
 ## What the agent does
 
 - Opens the exact work you name, such as “Use Canvas coursework for NSW 555 quiz 2,” and gathers the relevant documents from that course or classwork module. A full course sync is available when requested. The default course hub is `~/Documents/Codex/Canvas Courses`.
-- Reads quiz questions and Word assignments from rendered screenshots, scrolling through relevant pages. A downloaded Word file must be rendered before reading. Quiz page text is excluded from the app's text snapshot; Word viewers can use visual-only mode.
+- Reads quiz questions and Word assignments from rendered screenshots, scrolling through relevant pages including embedded document viewers. A downloaded Word file must be rendered before reading. Quiz page text is excluded from the app's text snapshot; Word viewers can use visual-only mode.
 - Uses matching course sources to prepare answers in original wording, with citations where needed. For prose, it applies Humanizer as a final writing edit without inventing the student's experiences.
 - Selects or types requested answers but stops before **Submit**, **Turn In**, or **Finish**. Finished files appear in the browser's **Downloads** menu so you can open or locate them.
 - Shows a resizable conversation panel and a compact bottom chat bar. The app can switch between a window and full screen.
